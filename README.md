@@ -6,7 +6,7 @@ The main resource is the [tutorial.Rmd](tutorial.Rmd) notebook. If you only want
 
 ## Schedule a tutorial
 
-I'm happy to give in-person/online tutorials if you have a group interested in learning and applying antigenic cartography; [email me](mailto:slj38@cam.ac.uk?subject=Racmacs\ tutorial). I will prioritise groups within my networks (Cambridge Infectious Diseases, UKHSA, GISRS, CEIRR, PROVAC).
+I'm happy to give in-person/online tutorials if you have a group interested in learning and applying antigenic cartography; [email me](mailto:slj38@cam.ac.uk?subject="Racmacs tutorial"). I will prioritise groups within my networks (Cambridge Infectious Diseases, UKHSA, GISRS, CEIRR, PROVAC).
 
 ## Problems and questions
 
