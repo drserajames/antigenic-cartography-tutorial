@@ -1,0 +1,56 @@
+---
+title: "Antigenic cartography using Racmacs"
+output: html_document
+date: "2024-02-23"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+
+1. Creating a map
+2. Plotting a map
+3. Quality assuring a map
+
+* Reading in data
+* Making a map
+* Merging tables
+* Adding sequence data
+* Using the viewer (connection lines, error lines, stress dots, dragging points)
+* Procrustes
+* Point uncertainty (blobs)
+
+## Making a map
+
+### Reading in data
+
+### Making a map
+
+### Merging tables
+
+## Plotting a map
+
+### Colours and shapes
+
+### Adding sequence data
+
+## Quality assurance
+
+### Stress 
+
+### Viewer features (connection lines, error lines, stress dots)
+
+### Procrustes
+
+### Point uncertainty (blob)
+
+## Additional analyses
+
+###
+
+
+
+
