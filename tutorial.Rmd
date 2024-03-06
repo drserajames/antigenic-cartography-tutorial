@@ -281,7 +281,7 @@ map_from_map_rm2 <- removeSera(map_from_map_rm2, 'MA/G252/93')
 set.seed(ran_seed)
 map_from_map_rm2 <- optimizeMap(map = map_from_map_rm2, number_of_dimensions = 2, number_of_optimizations = 100)
 
-pc <- procrustesMap(map_from_map_rfm2, map_from_map_rm2, 1, 2)
+pc <- procrustesMap(map_from_map_rm2, map_from_map_rm2, 1, 2)
 view(pc)
 ```
 
