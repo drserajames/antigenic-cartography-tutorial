@@ -1,0 +1,47 @@
+---
+title: "Shiny app tutorial"
+output: html_document
+date: "2024-03-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+## Introduction
+
+Some map making and assessing quality can be done using point and click. 
+
+## Making maps
+
+Run the two following commands in the the console:
+
+```{r library}
+library(Racmacs)
+```
+
+```{r gui}
+runGUI()
+```
+
+Click "Load table" and navigate to the data folder and select "small-dataset.csv". Then click on "Optimizations", select your number of optimisations, minimum colum basis and number of dimensions then click "Run optimizations"
+
+This is very similar to the view that you see in RStudio by typing view(map).
+
+You can then save your map, table or coordinates, for further plotting or analysis.
+
+You can also load a map into the GUI by clicking "Load map".
+
+## Map quality
+
+From the "Coloring" tab you can colour by stress; higher stress points are ones where the antigenic map fits the data less well.
+
+From the "Diagnostics" tab, you can select an antigen and turn on 
+
+* connection lines (button "C" or ctrl-c) which show which sera have been titrated against that antigen
+* error lines (button "E" or ctrl-e) which show the error in positioning. Red is too close and blue is too far. If both the antigen and sera are moved to the end of their line then there would be no difference between the map and table distances for that measurement.
+* titre values (no button, ctrl-t)
+
+
+
+
