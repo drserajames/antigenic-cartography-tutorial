@@ -80,18 +80,23 @@ set.seed(ran_seed)
 map_3d <- optimizeMap(map = map, number_of_dimensions = 3, number_of_optimizations = 100)
 ```
 
+### Saving your map
+
+```{r save-map}
+save.acmap(map_from_map, "out/map_from_map.ace")
+```
+
 ### Merging tables
 
 Remember when merging tables that names & IDs need to be identical
 
-Here I'm generating artificial data to show the principles of merging data. You don't need to worry about this step when analysing data.
+First, open the file with the table to be merged.
 
-```{r simulating-data}
-set.seed(ran_seed)
-data2 <- 10*2^round(logtiterTable(map)+rnorm(length(logtiterTable(map)), mean=0, sd=0.5))
-data2[data2<20] <- "<20"
-data2[data2=="NaN"] <- "*"
-dimnames(data2) <- dimnames(data1)
+```{r loading-second-dataset}
+data2 <- read.csv("data/small-dataset-2.csv", row.names=1)
+# replace "/" in sera names
+colnames(data2) <- gsub(".", "/", colnames(data2), fixed=T) 
+
 map2 <- acmap(titer_table= data2)
 ```
 
@@ -169,18 +174,23 @@ view(map_from_map)
 
 ### Stress 
 
+The stress is the measure of how well the data fits the map (lower stress is better). It can be calculated for the whole map or per antigen & per serum
+
 ```{r stress}
 mapStress(map_from_map)
 
-plot(allMapStresses(map_from_map))
-```
+hist(agStress(map_from_map))
+hist(srStress(map_from_map))
 
-```{r more-optimisation}
-mapStress(map_from_map)
+hist(agStressPerTiter(map_from_map))
+hist(srStressPerTiter(map_from_map))
 
 ams <- allMapStresses(map_from_map)
+head(ams)
 plot(ams)
 ```
+
+If the top values of the stress are not similar, then the optimisation to make the map has not converged and either more optimisations are required or there are other issues with your data.
 
 We can also compare stress between different merging methods
 
@@ -194,6 +204,14 @@ mapStress(merge_incremental)
 ```{r viewer}
 view(map_from_map)
 ```
+
+From the "Coloring" tab you can colour by stress; higher stress points are ones where the antigenic map fits the data less well.
+
+From the "Diagnostics" tab, you can select an antigen and turn on 
+
+* connection lines (button "C" or ctrl-c) which show which sera have been titrated against that antigen
+* error lines (button "E" or ctrl-e) which show the error in positioning. Red is too close and blue is too far. If both the antigen and sera are moved to the end of their line then there would be no difference between the map and table distances for that measurement.
+* titre values (no button, ctrl-t)
 
 ### Procrustes
 
@@ -219,15 +237,24 @@ pc_data$total_rmsd
 We can also perform a procrustes to the other optimisations and plot this.
 
 ```{r self-procrustes}
-pc_rmsd <- rep(NA, numOptimizations(map_from_map))
+pc_rmsd <- pc_rmedsd <- rep(NA, numOptimizations(map_from_map))
 for (i in 1:numOptimizations(map_from_map)){
-  pc_rmsd[i] <- procrustesData(map_from_map, map_from_map, 1, i)$total_rmsd
+  pc_output <- procrustesData(map_from_map, map_from_map, 1, i)
+  pc_rmsd[i] <- pc_output$total_rmsd
+  pc_rmedsd[i] <- sqrt(median(c(pc_output$ag_dists, pc_output$sr_dists)^2))
 }
 
 plot(pc_rmsd)
-
 plot(ams, pc_rmsd)
+
+plot(pc_rmedsd)
+plot(ams, pc_rmedsd)
+
+plot(pc_rmsd, pc_rmedsd, asp=1)
+abline(0,1)
 ```
+
+Ideally there will be a low procrustes distance between the top optimisations. If maps with similar stress have high procrustes distances, then the map is metastable. The RMSD (root mean square deviation) is affected by outliers such as a small number of antigens or sera hemisphering so the RMedSD (root median square deviation) can be a more robust measure.
 
 ### Point uncertainty (blob)
 
@@ -285,18 +312,47 @@ pc <- procrustesMap(map_from_map_rm2, map_from_map_rm2, 1, 2)
 view(pc)
 ```
 
-We still have an unstable map; what does this mean?
+We still have an unstable map. This is probably due to the limitations of the data and if this was a real experiment, we would consider making further measurments.
+
+### Dimension testing
+
+You can check how well different numbers of dimensions represent the underlying data. The stress will usually decrease when increasing the number of dimensions.
+
+```{r dim-stress}
+mapStress(map_from_map)
+mapStress(map_3d)
+```
+
+By removing data, we can test how well this removed data is predicted by maps with differing numbers of dimensions (cross-validation). The default setting test 1-5 dimesions, removing 10% of the data, 1000 optimisation and 100 replicates per dimension. Here I've saved the output of the code as it takes a while to run.
+
+```{r dim-test}
+# dim_test <- dimensionTestMap(map_from_map)
+# save(dim_test, file="out/dim_test.RData")
+
+load("out/dim_test.RData")
+dim_test
+
+#plotting for detectable titres
+ci <- 1.96*sqrt(dim_test$var_rmse_detectable/100)
+plot(dim_test$dimensions, dim_test$mean_rmse_detectable, ylim=range(c(dim_test$mean_rmse_detectable+ci, dim_test$mean_rmse_detectable-ci)))
+arrows(dim_test$dimensions, dim_test$mean_rmse_detectable+ci, dim_test$dimensions, dim_test$mean_rmse_detectable-ci, length=0.1, angle=90, code=3)
+```
+
+The minimum is at 2 dimensions, suggesting this is best for this dataset. Sometimes you may want to use fewer dimensions for interpretability.
 
 ## FAQs
 
 ### How to get distance from all points?
 
 ```{r dist}
-dist_mat <- as.matrix(dist(ptCoords(map_from_map)))
+dist_mat <- as.matrix(dist(agCoords(map_from_map)))
 ```
-
 
 ### How to handle repeated sera?
 
-If they are technical replicates (i.e. the same serum sample, titrated more than one), then I would recommend merging before antigenic cartography (assuming that the replicates are sufficiently similar).
+If they are sufficiently similar, they can be merged
+
+### How many sera should you have overlapping when merging tables?
+
+[answer pending]
 
