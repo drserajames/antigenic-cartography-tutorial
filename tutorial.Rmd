@@ -298,5 +298,5 @@ dist_mat <- as.matrix(dist(ptCoords(map_from_map)))
 
 ### How to handle repeated sera?
 
-If they are technical replciates (i.e. the same serum sample, titrated more than one), then I would recommend merging before antigenic cartography (assuming that the replicates are sufficiently similar).
+If they are technical replicates (i.e. the same serum sample, titrated more than one), then I would recommend merging before antigenic cartography (assuming that the replicates are sufficiently similar).
 
