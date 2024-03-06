@@ -107,11 +107,13 @@ merge_table <- mergeMaps(map, map2, method="table")
 merge_map <- optimizeMap(merge_table, 2, 100)
 ```
 
-If you already have a map, you can merge your new data in either by using the original map as a starting point, or freezing the original map and then merging new data in (this can be useful when you are merging mutants in and want to keep the background map consistent). I won't demonstrate the frozen merge here as the two datasets completely overlap
+If you already have a map, you can merge your new data in either by using the original map as a starting point, or freezing the original map and then merging new data in (this can be useful when you are merging mutants in and want to keep the background map consistent). I won't demonstrate the frozen merge here as the two datasets completely overlap.
 
 ```{r other-merge}
 merge_incremental <- mergeMaps(map_from_map, map2, method="incremental-merge", number_of_dimensions = 2, number_of_optimizations = 100)
 ```
+
+There are some additional methods described [here](https://acorg.github.io/Racmacs/articles/merging-maps.html) that may be applicable to your research.
 
 ## Plotting a map
 
@@ -124,6 +126,8 @@ view(map_from_map)
 ```
 
 ### Adding sequence data
+
+Largely copied from [here](https://acorg.github.io/Racmacs/articles/adding-sequences.html) and there is also a [youtube tutorial](https://www.youtube.com/watch?v=0IzubUMvl10)
 
 Sequence data is added as a matrix, so if you start with a fasta file you will need to do a little pre-processing (aligning and trimming your sequences & then changing from a list to a matrix).
 
@@ -147,7 +151,7 @@ srSequences(map_from_map) <- sr_sequences[srNames(map_from_map),]
 
 ### Colours, shapes and sizes
 
-Color, shape, size, outline colour and outline width can be customised for antigens and sera. A few examples below.
+Color, shape, size, outline colour and outline width can be customised for antigens and sera. A few examples below. You can find more detail on styling maps [here](https://acorg.github.io/Racmacs/articles/customising-map-appearance.html)
 
 ```{r}
 # color by year
@@ -228,11 +232,14 @@ agIDs(map_2004) <- rep("", numAntigens(map_2004))
 ```{r procrustes}
 map_from_map <- realignMap(map_from_map, map_2004)
 pc <- procrustesMap(map_from_map, map_2004)
+view(pc)
 
 pc_data <- procrustesData(map_from_map, map_2004)
 names(pc_data)
 pc_data$total_rmsd
 ```   
+
+You can see another example of procrustes, including 3D procrustes, [here](https://acorg.github.io/Racmacs/articles/comparing-maps.html)
 
 We can also perform a procrustes to the other optimisations and plot this.
 
@@ -338,21 +345,32 @@ plot(dim_test$dimensions, dim_test$mean_rmse_detectable, ylim=range(c(dim_test$m
 arrows(dim_test$dimensions, dim_test$mean_rmse_detectable+ci, dim_test$dimensions, dim_test$mean_rmse_detectable-ci, length=0.1, angle=90, code=3)
 ```
 
-The minimum is at 2 dimensions, suggesting this is best for this dataset. Sometimes you may want to use fewer dimensions for interpretability.
+The minimum is at 2 dimensions, suggesting this is best for this dataset. Sometimes you may want to use fewer dimensions for interpretability if there is marginal benefit with higher dimensions.
 
 ## FAQs
 
-### How to get distance from all points?
+### How to get distance between all antigens?
 
 ```{r dist}
 dist_mat <- as.matrix(dist(agCoords(map_from_map)))
 ```
 
-### How to handle repeated sera?
+### How to handle repeated sera within the same table?
 
-If they are sufficiently similar, they can be merged
+If they are sufficiently similar, they can be merged. 
 
 ### How many sera should you have overlapping when merging tables?
 
-[answer pending]
+Map cohesion calculates the vertex connectivity of the map (the minimum number of point that need to be removed to eliminate all paths from one point to another). If you have n overlapping sera & antigens between merged tables, then the vertex connectivity will be 2n (assuming that non of these titres are undetectable). A vertex connectivity of "number of map dimensions + 1" is required for map stability. Therefore, 3 overlapping antigens and sera (vertex connectivity = 6) should be sufficient if the map has 3 dimensions (minimum vertex connectivity = 4).
+
+```{r map-cohesion}
+# original map
+mapCohesion(map_from_map)
+
+# map with uncoordinated antigens removed
+mapCohesion(map_from_map_rm)
+
+# map with potentialy poorly coordinated antigens removed
+mapCohesion(map_from_map_rm2)
+```
 
