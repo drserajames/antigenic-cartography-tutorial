@@ -59,7 +59,7 @@ set.seed(ran_seed)
 map_from_map <- optimizeMap(map = map, number_of_dimensions = 2, number_of_optimizations = 100)
 ```
 
-If you a sensible reason, you can fix the column base:
+If you have a sensible reason, you can fix the column base:
 
 ```{r fixed-col-base}
 set.seed(ran_seed)
